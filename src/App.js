@@ -1,23 +1,38 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
+  const [pokemonData, setPokemonData] = useState(null);
+  const [pokemonFilter, setPokemonFilter] = useState("");
+
+  const requestOptions = {
+    method: 'GET',
+    redirect: 'follow'
+  };
+
+  const onFilterChange = (event) => {
+    setPokemonFilter(event.target.value);
+  }
+  
+  useEffect(()=>{
+    fetch(`http://localhost:3001/pokemon?search=${pokemonFilter}`, requestOptions)
+      .then(response => response.text())
+      .then(result => setPokemonData(JSON.parse(result)))
+      .catch(error => console.log('error', error));
+  }, [pokemonFilter]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Backend Testing</h1>
+      <hr/>
+      <input value={pokemonFilter} onChange={onFilterChange}></input>
+      <ol>
+        {
+          pokemonData?.map((pokemon) => (
+            <li key={pokemon.id}>{pokemon.name.english}</li>
+          ))
+        }
+      </ol>
     </div>
   );
 }
